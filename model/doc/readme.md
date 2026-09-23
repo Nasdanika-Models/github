@@ -5,15 +5,9 @@
 
 [TOC levels=6]
 
-# Nasdanika GitHub Model
-
-> **Draft.** This document and [`github.xcore`](github.xcore) describe a design, not a shipped
-> module. See [`assessment.md`](assessment.md) for scope, sizing and the build-or-adopt argument,
-> and [`marketing-plan.md`](marketing-plan.md) for the writing this leads to.
-
 An [Ecore](https://www.eclipse.org/modeling/emf/) model of what GitHub holds: accounts,
-organizations, teams, repositories, branches, tags, releases, access and code ownership. Defined in
-[`github.xcore`](github.xcore). Loaded with [hub4j/github-api](https://github.com/hub4j/github-api),
+organizations, teams, repositories, branches, tags, releases, access and code ownership. 
+Loaded with [hub4j/github-api](https://github.com/hub4j/github-api),
 and shipping a `GitHubURIHandler` so EMF resources can be read from and written back to a repository
 without cloning it.
 
@@ -54,11 +48,10 @@ The one place the transport is allowed to show through is provenance, and it ear
 | **Out: Actions** | Workflows, runs, jobs, steps, runners, artifacts, environments, secrets. A bigger object graph than everything above put together, a different change rate, a different audience. A separate model that pairs with build and pipeline concerns |
 | **Out: collaboration** | Issues, pull requests, reviews, comments, labels, milestones, projects. The other large area, where the row counts are, and the place the [work model](https://work.models.nasdanika.org/) already has a vocabulary. A sibling model whose job is mostly projection |
 | **Out: git** | Commits, trees, blobs. Referenced by SHA, never restated |
-| **Out: packages** | GitHub Packages is a publishing destination, and destinations are the [release model](../release/readme.md)'s `Registry` |
+| **Out: packages** | GitHub Packages is a publishing destination, and destinations are the [release model](https://release.models.nasdanika.org/)'s `Registry` |
 
 The split is not squeamishness about size, it is the micro-model rule: a model should be small
 enough to read in a sitting, and each of those areas is a model's worth of concepts on its own.
-[`assessment.md`](assessment.md) argues the boundaries in detail.
 
 ## Identity
 
@@ -167,7 +160,7 @@ that reads repository content through the API, so a resource set can load a mode
 repository without cloning it. The counterpart of
 [`GitLabURIHandler`](https://github.com/Nasdanika-Models/gitlab/blob/main/model/src/main/java/org/nasdanika/models/gitlab/util/GitLabURIHandler.java).
 
-**URI format**, chosen to mirror `raw.githubusercontent.com` so that a URI is recognisable at sight:
+**URI format**, chosen to mirror `raw.githubusercontent.com` so that a URI is recognizable at sight:
 
 ```
 github://<host alias>/<owner>/<repository>/<ref>/<path>[/!<jar path>]
@@ -195,7 +188,8 @@ try (GitHub gitHub = new GitHubBuilder().withOAuthToken(token).build()) {
 ```
 
 Combined with a dispatching resource factory, this is how a `pom.xml` loads through the
-[Maven model](https://maven.models.nasdanika.org/) and a `module-info.java` through the Java model,
+[Maven model](https://maven.models.nasdanika.org/) and a `module-info.java` through the
+[Java model](https://java.models.nasdanika.org/),
 straight from a hundred repositories, with no working copies on disk.
 
 **Writing back is where GitHub is better than GitLab, and the handler should exploit it.** The
@@ -216,13 +210,13 @@ Base classes come from [NxCore](https://nxcore.models.nasdanika.org/), and nothi
 
 | Model | Relationship |
 |---|---|
-| [Release](../release/readme.md) | This model is the **source**, the release model the **target**. Load the four organizations, project repositories into the release model's repository catalog, and read tags and releases back when cutting a release. Neither depends on the other's shape |
+| [Release](https://release.models.nasdanika.org/) | This model is the **source**, the release model the **target**. Load the four organizations, project repositories into the release model's repository catalog, and read tags and releases back when cutting a release. Neither depends on the other's shape |
 | [Git](https://github.com/Nasdanika-Models/git) | `commitSha` resolves into commits and trees. This model holds the GitHub layer above git, not git |
 | [GitLab](https://gitlab.models.nasdanika.org/) | Sibling, same problem, physical where this is logical. A neutral projection over both is the eventual answer for a multi-forge estate |
 | [Maven](https://maven.models.nasdanika.org/) | `pom.xml` loaded through the URI handler and parsed by the Maven model is how repository content becomes typed data |
 | [Work](https://work.models.nasdanika.org/) | Where issues and pull requests will project to, when the collaboration model arrives |
-| [Cypher](../cypher/readme.md) | The query surface. An estate of a hundred repositories with teams, permissions and ownership is a graph, and every interesting question about it is a traversal |
-| [Architecture](../architecture/README.md) | Architecture as code: repositories carrying the models that describe the systems they build |
+| [Cypher](https://cypher.models.nasdanika.org/) | The query surface. An estate of a hundred repositories with teams, permissions and ownership is a graph, and every interesting question about it is a traversal |
+| [Architecture](https://architecture.models.nasdanika.org/) | Architecture as code: repositories carrying the models that describe the systems they build |
 
 The first instance model is the Nasdanika estate itself: four organizations, roughly a hundred
 repositories, loaded programmatically, published as JSON, and browsable in the reflective viewer.
